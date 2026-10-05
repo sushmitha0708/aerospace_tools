@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ISA Atmosphere Calculator</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>ISA Atmosphere Calculator</h1>
+
+        <div class="input-section">
+
+            <label>
+                Altitude
+            </label>
+
+            <input
+                type="number"
+                id="altitude"
+                value="0"
+            >
+
+            <select id="altitudeUnit">
+                <option value="m">m</option>
+                <option value="km">km</option>
+                <option value="ft">ft</option>
+                <option value="kft">kft</option>
+            </select>
+
+            <button onclick="calculateISA()">
+                Calculate
+            </button>
+
+        </div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>SI</th>
+                    <th>FPS</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>Altitude</td>
+                    <td id="altitudeSI">-</td>
+                    <td id="altitudeFPS">-</td>
+                </tr>
+
+                <tr>
+                    <td>Temperature</td>
+                    <td id="temperatureSI">-</td>
+                    <td id="temperatureFPS">-</td>
+                </tr>
+
+                <tr>
+                    <td>Pressure</td>
+                    <td id="pressureSI">-</td>
+                    <td id="pressureFPS">-</td>
+                </tr>
+
+                <tr>
+                    <td>Density</td>
+                    <td id="densitySI">-</td>
+                    <td id="densityFPS">-</td>
+                </tr>
+
+                <tr>
+                    <td>Speed of Sound</td>
+                    <td id="soundSI">-</td>
+                    <td id="soundFPS">-</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
