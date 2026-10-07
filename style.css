@@ -1,0 +1,84 @@
+/* =========================================
+   ISA PLOT GRID
+   ========================================= */
+
+   .plots-section {
+    margin-top: 30px;
+}
+
+
+.plots-section h2 {
+    margin-bottom: 20px;
+}
+
+
+/* 2 x 2 grid */
+
+.plots-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+}
+
+
+/* Individual chart */
+
+.chart-card {
+
+    background: #1e293b;
+
+    border-radius: 10px;
+
+    padding: 15px;
+
+    border: 1px solid #334155;
+
+}
+
+
+.chart-card h3 {
+
+    margin-top: 0;
+
+    margin-bottom: 10px;
+
+    font-size: 18px;
+
+    color: #e2e8f0;
+
+}
+
+
+/* Chart size */
+
+.chart-container {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 350px;
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+/* On smaller screens, switch to one column */
+
+@media (max-width: 800px) {
+
+    .plots-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
