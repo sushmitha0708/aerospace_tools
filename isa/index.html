@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ISA Atmosphere Calculator</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-top: 30px;
+        }
+
+        /* ================================
+           INPUT
+           ================================ */
+
+        .input-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+
+            padding: 20px;
+
+            background: #1e293b;
+
+            border-radius: 10px;
+
+            margin-bottom: 25px;
+        }
+
+        .input-section input,
+        .input-section select,
+        .input-section button {
+
+            padding: 10px 12px;
+
+            font-size: 16px;
+
+            border-radius: 5px;
+
+            border: 1px solid #475569;
+        }
+
+        .input-section input,
+        .input-section select {
+            background: #0f172a;
+            color: white;
+        }
+
+        .input-section button {
+
+            background: #2563eb;
+
+            color: white;
+
+            border: none;
+
+            cursor: pointer;
+        }
+
+        .input-section button:hover {
+            background: #1d4ed8;
+        }
+
+
+        /* ================================
+           TABLE
+           ================================ */
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            background: #1e293b;
+
+            margin-bottom: 30px;
+        }
+
+        th,
+        td {
+
+            padding: 12px;
+
+            border: 1px solid #334155;
+
+            text-align: center;
+        }
+
+        th {
+
+            background: #334155;
+
+            color: white;
+        }
+
+
+        /* ================================
+           2 x 2 PLOT GRID
+           ================================ */
+
+        .plots-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+
+            gap: 20px;
+
+            margin-top: 20px;
+        }
+
+
+        .chart-card {
+
+            background: #1e293b;
+
+            border: 1px solid #334155;
+
+            border-radius: 10px;
+
+            padding: 15px;
+
+            min-width: 0;
+        }
+
+
+        .chart-card h3 {
+
+            margin: 0 0 10px 0;
+
+            font-size: 17px;
+
+            color: #f1f5f9;
+
+        }
+
+
+        .chart-container {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 360px;
+        }
+
+
+        /* ================================
+           MOBILE
+           ================================ */
+
+        @media (max-width: 850px) {
+
+            .plots-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>ISA Atmosphere Calculator</h1>
+
+
+    <!-- ==================================
+         INPUT
+         ================================== -->
+
+    <div class="input-section">
+
+        <label for="altitude">
+            Altitude
+        </label>
+
+        <input
+            type="number"
+            id="altitude"
+            value="0"
+            step="any"
+        >
+
+        <select id="altitudeUnit">
+
+            <option value="m">m</option>
+
+            <option value="km">km</option>
+
+            <option value="ft">ft</option>
+
+            <option value="kft">kft</option>
+
+        </select>
+
+        <button onclick="calculateISA()">
+            Calculate
+        </button>
+
+    </div>
+
+
+    <!-- ==================================
+         RESULTS
+         ================================== -->
+
+    <h2>Atmosphere Properties</h2>
+
+    <table>
+
+        <thead>
+
+        <tr>
+
+            <th>
+                Property
+            </th>
+
+            <th>
+                SI
+            </th>
+
+            <th>
+                FPS
+            </th>
+
+        </tr>
+
+        </thead>
+
+
+        <tbody>
+
+        <tr>
+
+            <td>
+                Altitude
+            </td>
+
+            <td id="altitudeSI">
+                -
+            </td>
+
+            <td id="altitudeFPS">
+                -
+            </td>
+
+        </tr>
+
+
+        <tr>
+
+            <td>
+                Temperature
+            </td>
+
+            <td id="temperatureSI">
+                -
+            </td>
+
+            <td id="temperatureFPS">
+                -
+            </td>
+
+        </tr>
+
+
+        <tr>
+
+            <td>
+                Pressure
+            </td>
+
+            <td id="pressureSI">
+                -
+            </td>
+
+            <td id="pressureFPS">
+                -
+            </td>
+
+        </tr>
+
+
+        <tr>
+
+            <td>
+                Density
+            </td>
+
+            <td id="densitySI">
+                -
+            </td>
+
+            <td id="densityFPS">
+                -
+            </td>
+
+        </tr>
+
+
+        <tr>
+
+            <td>
+                Speed of Sound
+            </td>
+
+            <td id="soundSI">
+                -
+            </td>
+
+            <td id="soundFPS">
+                -
+            </td>
+
+        </tr>
+
+        </tbody>
+
+    </table>
+
+
+    <!-- ==================================
+         FOUR PLOTS
+         ================================== -->
+
+    <h2>ISA Atmosphere Profiles</h2>
+
+
+    <div class="plots-grid">
+
+
+        <!-- TEMPERATURE -->
+
+        <div class="chart-card">
+
+            <h3>
+                Temperature vs Altitude
+            </h3>
+
+            <div class="chart-container">
+
+                <canvas id="temperatureChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- PRESSURE -->
+
+        <div class="chart-card">
+
+            <h3>
+                Pressure vs Altitude
+            </h3>
+
+            <div class="chart-container">
+
+                <canvas id="pressureChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- DENSITY -->
+
+        <div class="chart-card">
+
+            <h3>
+                Density vs Altitude
+            </h3>
+
+            <div class="chart-container">
+
+                <canvas id="densityChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- SPEED OF SOUND -->
+
+        <div class="chart-card">
+
+            <h3>
+                Speed of Sound vs Altitude
+            </h3>
+
+            <div class="chart-container">
+
+                <canvas id="soundChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+/* =====================================================
+   ISA CONSTANTS
+   ===================================================== */
+
+const R = 287.05287;
+
+const GAMMA = 1.4;
+
+const G0 = 9.80665;
+
+const T0 = 288.15;
+
+const P0 = 101325.0;
+
+
+/* =====================================================
+   ISA LAYERS
+   ===================================================== */
+
+const hLayers = [
+
+    0,
+
+    11000,
+
+    20000,
+
+    32000,
+
+    47000,
+
+    51000,
+
+    71000,
+
+    84852
+
+];
+
+
+const lapseRates = [
+
+    -0.0065,
+
+     0.0000,
+
+     0.0010,
+
+     0.0028,
+
+     0.0000,
+
+    -0.0028,
+
+    -0.0020
+
+];
+
+
+/* =====================================================
+   UNIT CONVERSION
+   ===================================================== */
+
+function toMetres(value, unit) {
+
+    if (unit === "m")
+        return value;
+
+    if (unit === "km")
+        return value * 1000;
+
+    if (unit === "ft")
+        return value * 0.3048;
+
+    if (unit === "kft")
+        return value * 1000 * 0.3048;
+
+    return value;
+}
+
+
+/* =====================================================
+   ISA CALCULATION
+   ===================================================== */
+
+function isaAtmosphere(h) {
+
+    h = Math.max(
+        0,
+        Math.min(h, 84852)
+    );
+
+
+    let Tbase = T0;
+
+    let Pbase = P0;
+
+
+    for (
+        let i = 0;
+        i < lapseRates.length;
+        i++
+    ) {
+
+        const hb = hLayers[i];
+
+        const ht = hLayers[i + 1];
+
+        const L = lapseRates[i];
+
+
+        /*
+         * Requested altitude is inside
+         * this layer.
+         */
+
+        if (h <= ht) {
+
+            const dh = h - hb;
+
+
+            let T;
+            let P;
+
+
+            if (L === 0) {
+
+                T = Tbase;
+
+                P =
+                    Pbase *
+                    Math.exp(
+                        -G0 * dh /
+                        (R * Tbase)
+                    );
+
+            }
+            else {
+
+                T =
+                    Tbase +
+                    L * dh;
+
+
+                P =
+                    Pbase *
+                    Math.pow(
+                        T / Tbase,
+                        -G0 / (R * L)
+                    );
+
+            }
+
+
+            const rho =
+                P / (R * T);
+
+
+            const a =
+                Math.sqrt(
+                    GAMMA * R * T
+                );
+
+
+            return {
+
+                temperature: T,
+
+                pressure: P,
+
+                density: rho,
+
+                soundSpeed: a
+
+            };
+
+        }
+
+
+        /*
+         * Move completely through
+         * this layer.
+         */
+
+        const dh =
+            ht - hb;
+
+
+        if (L === 0) {
+
+            Pbase =
+                Pbase *
+                Math.exp(
+                    -G0 * dh /
+                    (R * Tbase)
+                );
+
+        }
+        else {
+
+            const Ttop =
+                Tbase +
+                L * dh;
+
+
+            Pbase =
+                Pbase *
+                Math.pow(
+                    Ttop / Tbase,
+                    -G0 / (R * L)
+                );
+
+
+            Tbase =
+                Ttop;
+
+        }
+
+    }
+
+
+    return {
+
+        temperature: Tbase,
+
+        pressure: Pbase,
+
+        density:
+            Pbase / (R * Tbase),
+
+        soundSpeed:
+            Math.sqrt(
+                GAMMA * R * Tbase
+            )
+
+    };
+
+}
+
+
+/* =====================================================
+   CHART VARIABLES
+   ===================================================== */
+
+let temperatureChart = null;
+
+let pressureChart = null;
+
+let densityChart = null;
+
+let soundChart = null;
+
+
+/* =====================================================
+   GENERATE PROFILE DATA
+   ===================================================== */
+
+function generateProfileData() {
+
+    const temperature = [];
+
+    const pressure = [];
+
+    const density = [];
+
+    const sound = [];
+
+
+    /*
+     * Include every ISA layer boundary.
+     * This is important for seeing the
+     * correct slope changes.
+     */
+
+    const altitudes = [];
+
+
+    for (
+        let h = 0;
+        h <= 84852;
+        h += 250
+    ) {
+
+        altitudes.push(h);
+
+    }
+
+
+    /*
+     * Explicitly add all layer boundaries.
+     */
+
+    hLayers.forEach(h => {
+
+        if (!altitudes.includes(h)) {
+
+            altitudes.push(h);
+
+        }
+
+    });
+
+
+    altitudes.sort(
+        (a, b) => a - b
+    );
+
+
+    altitudes.forEach(h => {
+
+        const result =
+            isaAtmosphere(h);
+
+
+        const altitudeKm =
+            h / 1000;
+
+
+        temperature.push({
+
+            x: result.temperature,
+
+            y: altitudeKm
+
+        });
+
+
+        pressure.push({
+
+            x: result.pressure / 1000,
+
+            y: altitudeKm
+
+        });
+
+
+        density.push({
+
+            x: result.density,
+
+            y: altitudeKm
+
+        });
+
+
+        sound.push({
+
+            x: result.soundSpeed,
+
+            y: altitudeKm
+
+        });
+
+    });
+
+
+    return {
+
+        temperature,
+
+        pressure,
+
+        density,
+
+        sound
+
+    };
+
+}
+
+
+/* =====================================================
+   COMMON CHART OPTIONS
+   ===================================================== */
+
+function chartOptions(xTitle) {
+
+    return {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        animation: false,
+
+        parsing: false,
+
+
+        scales: {
+
+            x: {
+
+                type: "linear",
+
+                title: {
+
+                    display: true,
+
+                    text: xTitle,
+
+                    color: "#cbd5e1"
+
+                },
+
+                ticks: {
+
+                    color: "#94a3b8"
+
+                },
+
+                grid: {
+
+                    color: "#334155"
+
+                }
+
+            },
+
+
+            y: {
+
+                type: "linear",
+
+                min: 0,
+
+                max: 84.852,
+
+                title: {
+
+                    display: true,
+
+                    text: "Altitude (km)",
+
+                    color: "#cbd5e1"
+
+                },
+
+                ticks: {
+
+                    color: "#94a3b8"
+
+                },
+
+                grid: {
+
+                    color: "#334155"
+
+                }
+
+            }
+
+        },
+
+
+        plugins: {
+
+            legend: {
+
+                labels: {
+
+                    color: "#e2e8f0"
+
+                }
+
+            }
+
+        }
+
+    };
+
+}
+
+
+/* =====================================================
+   CREATE CHARTS
+   ===================================================== */
+
+function createCharts(selectedAltitude) {
+
+    const data =
+        generateProfileData();
+
+
+    const selected =
+        isaAtmosphere(
+            selectedAltitude
+        );
+
+
+    const selectedKm =
+        selectedAltitude / 1000;
+
+
+    /*
+     * Destroy old charts.
+     */
+
+    if (temperatureChart)
+        temperatureChart.destroy();
+
+    if (pressureChart)
+        pressureChart.destroy();
+
+    if (densityChart)
+        densityChart.destroy();
+
+    if (soundChart)
+        soundChart.destroy();
+
+
+    /* ================================================
+       TEMPERATURE
+       ================================================ */
+
+    temperatureChart =
+        new Chart(
+
+            document.getElementById(
+                "temperatureChart"
+            ),
+
+            {
+
+                type: "line",
+
+                data: {
+
+                    datasets: [
+
+                        {
+
+                            label: "Temperature",
+
+                            data:
+                                data.temperature,
+
+                            borderColor:
+                                "#ef4444",
+
+                            borderWidth: 2,
+
+                            pointRadius: 0,
+
+                            tension: 0
+
+                        },
+
+
+                        {
+
+                            label:
+                                "Selected altitude",
+
+                            data: [
+
+                                {
+
+                                    x:
+                                        selected.temperature,
+
+                                    y:
+                                        selectedKm
+
+                                }
+
+                            ],
+
+                            borderColor:
+                                "#facc15",
+
+                            backgroundColor:
+                                "#facc15",
+
+                            pointRadius: 6,
+
+                            showLine: false
+
+                        }
+
+                    ]
+
+                },
+
+                options:
+                    chartOptions(
+                        "Temperature (K)"
+                    )
+
+            }
+
+        );
+
+
+    /* ================================================
+       PRESSURE
+       ================================================ */
+
+    pressureChart =
+        new Chart(
+
+            document.getElementById(
+                "pressureChart"
+            ),
+
+            {
+
+                type: "line",
+
+                data: {
+
+                    datasets: [
+
+                        {
+
+                            label: "Pressure",
+
+                            data:
+                                data.pressure,
+
+                            borderColor:
+                                "#38bdf8",
+
+                            borderWidth: 2,
+
+                            pointRadius: 0,
+
+                            tension: 0
+
+                        },
+
+
+                        {
+
+                            label:
+                                "Selected altitude",
+
+                            data: [
+
+                                {
+
+                                    x:
+                                        selected.pressure / 1000,
+
+                                    y:
+                                        selectedKm
+
+                                }
+
+                            ],
+
+                            borderColor:
+                                "#facc15",
+
+                            backgroundColor:
+                                "#facc15",
+
+                            pointRadius: 6,
+
+                            showLine: false
+
+                        }
+
+                    ]
+
+                },
+
+                options:
+                    chartOptions(
+                        "Pressure (kPa)"
+                    )
+
+            }
+
+        );
+
+
+    /* ================================================
+       DENSITY
+       ================================================ */
+
+    densityChart =
+        new Chart(
+
+            document.getElementById(
+                "densityChart"
+            ),
+
+            {
+
+                type: "line",
+
+                data: {
+
+                    datasets: [
+
+                        {
+
+                            label: "Density",
+
+                            data:
+                                data.density,
+
+                            borderColor:
+                                "#22c55e",
+
+                            borderWidth: 2,
+
+                            pointRadius: 0,
+
+                            tension: 0
+
+                        },
+
+
+                        {
+
+                            label:
+                                "Selected altitude",
+
+                            data: [
+
+                                {
+
+                                    x:
+                                        selected.density,
+
+                                    y:
+                                        selectedKm
+
+                                }
+
+                            ],
+
+                            borderColor:
+                                "#facc15",
+
+                            backgroundColor:
+                                "#facc15",
+
+                            pointRadius: 6,
+
+                            showLine: false
+
+                        }
+
+                    ]
+
+                },
+
+                options:
+                    chartOptions(
+                        "Density (kg/m³)"
+                    )
+
+            }
+
+        );
+
+
+    /* ================================================
+       SPEED OF SOUND
+       ================================================ */
+
+    soundChart =
+        new Chart(
+
+            document.getElementById(
+                "soundChart"
+            ),
+
+            {
+
+                type: "line",
+
+                data: {
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "Speed of sound",
+
+                            data:
+                                data.sound,
+
+                            borderColor:
+                                "#a78bfa",
+
+                            borderWidth: 2,
+
+                            pointRadius: 0,
+
+                            tension: 0
+
+                        },
+
+
+                        {
+
+                            label:
+                                "Selected altitude",
+
+                            data: [
+
+                                {
+
+                                    x:
+                                        selected.soundSpeed,
+
+                                    y:
+                                        selectedKm
+
+                                }
+
+                            ],
+
+                            borderColor:
+                                "#facc15",
+
+                            backgroundColor:
+                                "#facc15",
+
+                            pointRadius: 6,
+
+                            showLine: false
+
+                        }
+
+                    ]
+
+                },
+
+                options:
+                    chartOptions(
+                        "Speed of sound (m/s)"
+                    )
+
+            }
+
+        );
+
+}
+
+
+/* =====================================================
+   CALCULATE
+   ===================================================== */
+
+function calculateISA() {
+
+    const value =
+        parseFloat(
+            document.getElementById(
+                "altitude"
+            ).value
+        );
+
+
+    const unit =
+        document.getElementById(
+            "altitudeUnit"
+        ).value;
+
+
+    if (isNaN(value)) {
+
+        alert(
+            "Please enter a valid altitude."
+        );
+
+        return;
+
+    }
+
+
+    const altitude =
+        toMetres(
+            value,
+            unit
+        );
+
+
+    if (
+        altitude < 0 ||
+        altitude > 84852
+    ) {
+
+        alert(
+            "Altitude must be between 0 and 84.852 km."
+        );
+
+        return;
+
+    }
+
+
+    const result =
+        isaAtmosphere(
+            altitude
+        );
+
+
+    /* ================================================
+       UNIT CONVERSIONS
+       ================================================ */
+
+    const altitudeFt =
+        altitude / 0.3048;
+
+
+    const altitudeKft =
+        altitudeFt / 1000;
+
+
+    const temperatureRankine =
+        result.temperature * 9 / 5;
+
+
+    const pressurePsf =
+        result.pressure *
+        0.0208854342;
+
+
+    const densitySlug =
+        result.density *
+        0.00194032033;
+
+
+    const soundSpeedFps =
+        result.soundSpeed *
+        3.280839895;
+
+
+    /* ================================================
+       TABLE
+       ================================================ */
+
+    document.getElementById(
+        "altitudeSI"
+    ).textContent =
+        altitude.toFixed(2) + " m";
+
+
+    document.getElementById(
+        "altitudeFPS"
+    ).textContent =
+        altitudeKft.toFixed(3) + " kft";
+
+
+    document.getElementById(
+        "temperatureSI"
+    ).textContent =
+        result.temperature.toFixed(2) + " K";
+
+
+    document.getElementById(
+        "temperatureFPS"
+    ).textContent =
+        temperatureRankine.toFixed(2) + " °R";
+
+
+    document.getElementById(
+        "pressureSI"
+    ).textContent =
+        (result.pressure / 1000)
+            .toFixed(4) + " kPa";
+
+
+    document.getElementById(
+        "pressureFPS"
+    ).textContent =
+        pressurePsf.toFixed(2) + " psf";
+
+
+    document.getElementById(
+        "densitySI"
+    ).textContent =
+        result.density.toFixed(6)
+        + " kg/m³";
+
+
+    document.getElementById(
+        "densityFPS"
+    ).textContent =
+        densitySlug.toFixed(8)
+        + " slug/ft³";
+
+
+    document.getElementById(
+        "soundSI"
+    ).textContent =
+        result.soundSpeed.toFixed(2)
+        + " m/s";
+
+
+    document.getElementById(
+        "soundFPS"
+    ).textContent =
+        soundSpeedFps.toFixed(2)
+        + " ft/s";
+
+
+    /* ================================================
+       UPDATE PLOTS
+       ================================================ */
+
+    createCharts(
+        altitude
+    );
+
+}
+
+
+/* =====================================================
+   INITIAL LOAD
+   ===================================================== */
+
+window.addEventListener(
+    "load",
+    function () {
+
+        calculateISA();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
